@@ -49,32 +49,6 @@ def entrenar_elastic_net(X_train, y_train, X_test, y_test, l1_ratios=[.1, .5, .7
 
 def entrenar_stepwise(X_train, y_train, X_test, y_test, max_iter=100):
 
-
-    # Convertir a dataframe de statsmodels
-    X_train_sm = sm.add_constant(X_train)
-    features = list(range(X_train_sm.shape[1]))
-
-    # Algoritmo forward stepwise
-    selected = [0]
-    remaining = list(set(features) - set(selected))
-    current_aic = sm.OLS(y_train, X_train_sm[:, selected]).fit().aic
-
-    for _ in range(max_iter):
-        aic_candidates = []
-        for candidate in remaining:
-            model = sm.OLS(y_train, X_train_sm[:, selected + [candidate]]).fit()
-            aic_candidates.append((model.aic, candidate))
-
-        aic_candidates.sort()
-        best_new_aic, best_candidate = aic_candidates[0]
-
-        if best_new_aic < current_aic:
-            selected.append(best_candidate)
-            remaining.remove(best_candidate)
-            current_aic = best_new_aic
-        else:
-            break
-
     # Entrenar modelo final con sklearn
     base_model = LinearRegression()
 
