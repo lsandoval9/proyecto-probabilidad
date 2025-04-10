@@ -1,7 +1,7 @@
 ---
 title: "Proyecto de probabilidad"
-author: "Luis Sandoval"
-date: "2025-04-07"
+author: "Luis Sandoval 26781082, Gabriel Rodriguez 30172571, Jose Rivero 28492353"
+date: "2025-04-11"
 output: pdf_document
 ---
 

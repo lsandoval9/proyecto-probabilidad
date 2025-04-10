@@ -9,6 +9,8 @@ from modelos.entrenamiento import (
 )
 import numpy as np
 import random
+import pandas as pd
+
 
 def main():
 
@@ -16,6 +18,11 @@ def main():
     seed = 2022
     np.random.seed(seed)
     random.seed(seed)
+
+    pd.set_option('display.max_rows', None)
+    pd.set_option('display.max_columns', None)
+    pd.set_option('display.width', None)
+    pd.set_option('display.max_colwidth', None)
 
     # Cargar datos
     df = cargar_datos('data/Ab19selec.csv')
@@ -27,7 +34,19 @@ def main():
     target = 'kg/ADT'
 
     # Preparar datos
-    X_train, X_test, y_train, y_test, _ = preparar_datos(df_limpio, target)
+    X_train, X_test, y_train, y_test, _, feature_names  = preparar_datos(df_limpio, target)
+
+
+    # Obtener correlaciones
+    df_train = pd.DataFrame(X_train, columns=feature_names)
+
+    df_train['target'] = y_train.values  # Añade el target
+
+    # Correlación de Pearson entre cada feature y el target
+    correlaciones_target = df_train.corr()['target'].drop('target').sort_values(ascending=False)
+
+    print("\n=== Correlaciones (Pearson) con el target ===")
+    print(correlaciones_target)
 
     # Entrenar todos los modelos
     modelo_lineal, mse_lineal, r2_lineal = entrenar_modelo_lineal(X_train, y_train, X_test, y_test)

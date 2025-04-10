@@ -81,6 +81,8 @@ def preparar_datos(df, target_col, test_size=0.2, random_state=2022):
 
     X = df.drop(columns=cols_to_drop)
 
+    feature_names = X.columns.tolist()
+
     y = df[target_col]
 
     # Dividir datos
@@ -104,4 +106,4 @@ def preparar_datos(df, target_col, test_size=0.2, random_state=2022):
 
     X_test_scaled = scaler.transform(X_test)
 
-    return X_train_scaled, X_test_scaled, y_train, y_test, scaler
+    return X_train_scaled, X_test_scaled, y_train, y_test, scaler, feature_names
