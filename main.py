@@ -10,7 +10,7 @@ from modelos.entrenamiento import (
 import numpy as np
 import random
 import pandas as pd
-
+import matplotlib.pyplot as plt
 
 def main():
 
@@ -49,15 +49,15 @@ def main():
     print(correlaciones_target)
 
     # Entrenar todos los modelos
-    modelo_lineal, mse_lineal, r2_lineal = entrenar_modelo_lineal(X_train, y_train, X_test, y_test)
+    modelo_lineal, mse_lineal, r2_lineal, coef_lineal  = entrenar_modelo_lineal(X_train, y_train, X_test, y_test)
 
-    modelo_ridge, mse_ridge, r2_ridge = entrenar_ridge(X_train, y_train, X_test, y_test)
+    modelo_ridge, mse_ridge, r2_ridge, coef_ridge = entrenar_ridge(X_train, y_train, X_test, y_test)
 
-    modelo_lasso, mse_lasso, r2_lasso = entrenar_lasso(X_train, y_train, X_test, y_test)
+    modelo_lasso, mse_lasso, r2_lasso, coef_lasso = entrenar_lasso(X_train, y_train, X_test, y_test)
 
-    modelo_enet, mse_enet, r2_enet = entrenar_elastic_net(X_train, y_train, X_test, y_test)
+    modelo_enet, mse_enet, r2_enet, coef_enet = entrenar_elastic_net(X_train, y_train, X_test, y_test)
 
-    modelo_stepwise, mse_stepwise, r2_stepwise, _ = entrenar_stepwise(X_train, y_train, X_test, y_test)
+    modelo_stepwise, mse_stepwise, r2_stepwise, _, coef_stepwise_full = entrenar_stepwise(X_train, y_train, X_test, y_test)
 
     # Mostrar resultados
     print("\n=== Resultados Comparativos ===")
@@ -66,6 +66,55 @@ def main():
     print(f"Lasso               - MSE: {mse_lasso:.2f}, R²: {r2_lasso:.2f}")
     print(f"Elastic Net         - MSE: {mse_enet:.2f}, R²: {r2_enet:.2f}")
     print(f"Stepwise            - MSE: {mse_stepwise:.2f}, R²: {r2_stepwise:.2f}")
+
+    plt.figure(figsize=(12, 8))
+    correlaciones_target.plot(kind='bar')
+    plt.title(f'Correlación de Features con el Target ({target})')
+    plt.xlabel('Features')
+    plt.ylabel('Correlación de Pearson')
+    plt.xticks(rotation=90)
+    plt.grid(axis='y', linestyle='--')
+    plt.tight_layout()
+    plt.show()
+
+    model_coefs = {
+        "Regresión Lineal": coef_lineal,
+        "Ridge": coef_ridge,
+        "Lasso": coef_lasso,
+        "Elastic Net": coef_enet,
+        "Stepwise": coef_stepwise_full
+    }
+
+    for model_name, coefficients in model_coefs.items():
+        if coefficients is not None:
+
+            if len(coefficients) == len(feature_names):
+                try:
+                    coef_series = pd.Series(coefficients, index=feature_names)
+
+                    coef_series_sorted = coef_series.abs().sort_values(ascending=False)
+
+                    coef_series_to_plot = coef_series[coef_series_sorted.index]
+
+                    plt.figure(figsize=(15, 8))
+                    coef_series_to_plot.plot(kind='bar', width=0.8)
+                    plt.title(f'Coeficientes de Regresión - Modelo: {model_name}')
+                    plt.xlabel('Features')
+                    plt.ylabel('Valor del Coeficiente')
+                    plt.xticks(rotation=90, fontsize=8)
+                    plt.grid(axis='y', linestyle='--')
+                    plt.axhline(0, color='black', linewidth=0.8, linestyle='--')
+                    plt.tight_layout()
+                    plt.show()
+                except Exception as e:
+                    print(f"Error al generar gráfico para el modelo '{model_name}': {e}")
+            else:
+
+                print(f"Advertencia: No se puede graficar '{model_name}'. "
+                      f"Longitud de coeficientes ({len(coefficients)}) no coincide con "
+                      f"longitud de feature_names ({len(feature_names)}).")
+        else:
+            print(f"Advertencia: Coeficientes no disponibles para el modelo '{model_name}'.")
 
 if __name__ == "__main__":
     main()

@@ -11,7 +11,7 @@ def entrenar_modelo_lineal(X_train, y_train, X_test, y_test):
     predicciones = modelo.predict(X_test)
     mse = mean_squared_error(y_test, predicciones)
     r2 = r2_score(y_test, predicciones)
-    return modelo, mse, r2
+    return modelo, mse, r2, modelo.coef_
 
 def entrenar_ridge(X_train, y_train, X_test, y_test):
 
@@ -23,7 +23,7 @@ def entrenar_ridge(X_train, y_train, X_test, y_test):
     mse = mean_squared_error(y_test, predicciones)
     r2 = r2_score(y_test, predicciones)
     print(f"  Ridge - Best alpha found: {modelo.alpha_:.4f}")
-    return modelo, mse, r2
+    return modelo, mse, r2, modelo.coef_
 
 
 def entrenar_lasso(X_train, y_train, X_test, y_test, n_alphas=100, random_state=2022):
@@ -33,7 +33,7 @@ def entrenar_lasso(X_train, y_train, X_test, y_test, n_alphas=100, random_state=
     mse = mean_squared_error(y_test, predicciones)
     r2 = r2_score(y_test, predicciones)
     print(f"  Lasso - Best alpha found: {modelo.alpha_:.4f}")
-    return modelo, mse, r2
+    return modelo, mse, r2, modelo.coef_
 
 
 def entrenar_elastic_net(X_train, y_train, X_test, y_test, l1_ratios=[.1, .5, .7, .9, .95, .99, 1], n_alphas=100, random_state=2022):
@@ -45,7 +45,7 @@ def entrenar_elastic_net(X_train, y_train, X_test, y_test, l1_ratios=[.1, .5, .7
     mse = mean_squared_error(y_test, predicciones)
     r2 = r2_score(y_test, predicciones)
     print(f"  ElasticNet - Best alpha: {modelo.alpha_:.4f}, Best l1_ratio: {modelo.l1_ratio_:.2f}")
-    return modelo, mse, r2
+    return modelo, mse, r2, modelo.coef_
 
 def entrenar_stepwise(X_train, y_train, X_test, y_test, max_iter=100):
 
@@ -74,4 +74,4 @@ def entrenar_stepwise(X_train, y_train, X_test, y_test, max_iter=100):
     r2 = r2_score(y_test, predicciones)
 
     print(f"  Stepwise - Features seleccionadas: {len(selected_features)}")
-    return modelo, mse, r2, selected_features
+    return modelo, mse, r2, selected_features, modelo.coef_
