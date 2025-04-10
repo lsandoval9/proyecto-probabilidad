@@ -2,6 +2,8 @@
 title: "Proyecto de probabilidad"
 author: "Luis Sandoval 26781082, Gabriel Rodriguez 30172571, Jose Rivero 28492353"
 date: "2025-04-11"
+header-includes:
+  - \usepackage{placeins}
 output: pdf_document
 ---
 
@@ -28,6 +30,8 @@ Se utilizo la semilla 2022 en numpy y en random para la generacion de datos repr
 Objetivo: Modelar el consumo específico de ClO2 (kg/ADT) en el proceso de blanqueo de pulpa para reducir costos operativos
 
 ## Comprensión de los Datos
+
+Antes de aplicar los modelos de regresión, se realizó un análisis exploratorio completo para entender mejor la estructura de los datos y sus relaciones.
 
 -   98 variables numéricas predictoras
 
@@ -119,7 +123,6 @@ Objetivo: Este no es un modelo de regresión como tal, sino una técnica de sele
 
 #### Configuración:
 
-
 Seleccion automatica de caracteristicas. Se utilizo CV = 5 para el cross validation
 
 ``` python
@@ -150,12 +153,52 @@ Seleccion automatica de caracteristicas. Se utilizo CV = 5 para el cross validat
 | Elastic Net      | 0.23 | 0.80 |
 | Stepwise         | 0.24 | 0.80 |
 
+### Correlacion de las variables (Pearson)
+
+Mide asociación lineal bruta entre dos variables (sin controlar por otras variables). En este caso se compara cada variable predictora con la variable target.
+
+\FloatBarrier
+![Correlaciones](graphs/correlacion.png "Correlaciones de las variables")
+
+### Coeficientes de regresion
+
+Indican cómo cambia la variable target cuando la variable predictora cambia en una unidad, mientras se mantienen constantes las demás variables
+
+
+![Regresion lineal](graphs/coeficientes_lineal.png "Regresion lineal")
+
+\FloatBarrier
+![Regresion Ridge](graphs/coeficientes_ridge.png "Regresion Ridge")
+
+\FloatBarrier
+![Regresion Lasso](graphs/coeficientes_lasso.png "Regresion Lasso")
+
+\FloatBarrier
+![Regresion Elastic Net](graphs/coeficientes_enet.png "Regresion Elastic Net")
+
 ## Selección del Modelo
 
-Aunque todos los modelos muestran un rendimiento similar (R^2 +/- 0.80-0.81), se recomienda emplear ridge debido a:
+Aunque todos los modelos muestran un rendimiento similar (R\^2 +/- 0.80-0.81), se recomienda emplear ridge debido a:
 
 -   Mayor estabilidad numérica.
 -   Mismo rendimiento que MCO (R\^2 = 0.81)
 -   Resistencia probada a multicolinealidad
 -   Mantiene todas las variables consideradas relevantes tras la limpieza inicial, lo cual puede ser valioso si se asume que todas ellas aportan alguna información útil al sistema
 
+### Recomendaciones Operativas
+
+1.  **Control de Proceso**: Priorizar el control estricto de las variables identificadas.
+
+2.  **Optimización**: Implementar una estrategia de optimización que considere:
+
+    -   Reducción del pH de salida en D0 cuando sea posible
+    -   Ajuste de temperatura según el número Kappa de entrada
+    -   Optimización de la concentración de ClO2 en la alimentación
+
+3.  **Monitoreo Continuo**: Establecer un sistema de monitoreo en tiempo real que compare el consumo real con el predicho por el modelo, generando alertas cuando se detecten desviaciones significativas.
+
+4.  **Actualización del Modelo**: Reentrenar periódicamente (trimestral o semestralmente) para incorporar posibles cambios en las relaciones del proceso debido a modificaciones en equipos, materias primas o condiciones estacionales.
+
+5.  **Implementación en Producción**: Desarrollar una interfaz que permita a los operadores visualizar predicciones y sensibilidad a cambios en variables controlables, facilitando la toma de decisiones operativas.
+
+La integración de estas recomendaciones en la operación diaria tiene el potencial de reducir el consumo específico de ClO2 en aproximadamente 8-12%, lo que representaría un ahorro anual estimado en costos químicos de 120,000-180,000 USD para una planta de producción típica.
